@@ -1,0 +1,16 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:Sunshine="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.luizcarlos.sunshine.DetailActivity" >
+
+    <item android:id="@+id/action_settings"
+        android:title="@string/action_settings"
+        android:orderInCategory="100"
+        Sunshine:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_share"
+        Sunshine:showAsAction="always"
+        android:title="@string/action_share"
+        Sunshine:actionProviderClass="android.support.v7.widget.ShareActionProvider"/>
+</menu>
