@@ -16,6 +16,12 @@
     <string name="action_map">map</string>
     <string name="action_share">share</string>
 
+    <!-- Date label when displaying today's weather forecast [CHAR LIMIT=20] -->
+    <string name="today">Today</string>
+
+    <!-- Date label when displaying tomorrow's weather forecast [CHAR LIMIT=20] -->
+    <string name="tomorrow">Tomorrow</string>
+
     <string-array name="pref_units_values">
         <item>@string/pref_units_metric</item>
         <item>@string/pref_units_imperial</item>

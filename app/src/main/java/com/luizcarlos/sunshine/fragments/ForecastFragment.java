@@ -16,7 +16,7 @@ import android.widget.ListView;
 
 import com.luizcarlos.sunshine.DetailActivity;
 import com.luizcarlos.sunshine.R;
-import com.luizcarlos.sunshine.adapters.ListItemForecast;
+import com.luizcarlos.sunshine.adapters.AdapterListItemForecast;
 import com.luizcarlos.sunshine.model.WeatherDay;
 import com.luizcarlos.sunshine.tasks.FetchWeatherTask;
 import com.luizcarlos.sunshine.utils.LogUtils;
@@ -29,7 +29,7 @@ import java.util.ArrayList;
 public class ForecastFragment extends Fragment {
 
     private static final String LOG_TAG = ForecastFragment.class.getSimpleName();
-    private ListItemForecast adapter;
+    private AdapterListItemForecast adapter;
 
     public ForecastFragment() {
     }
@@ -41,14 +41,14 @@ public class ForecastFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_my, container, false);
 
         ArrayList<String> list = new ArrayList<String>();
-        /*list.add("Today - Sunny - 88/63");
+        /*list.add("Today - Sunny - 88/63");®
         list.add("Monday - Sunny - 88/63");
         list.add("sunday - Sunny - 88/63");
         list.add("Friday - Sunny - 88/63");
         list.add("Wednesday - Sunny - 88/63");
         list.add("Satarday - Sunny - 88/63");*/
 
-        adapter = new ListItemForecast( getActivity(), new ArrayList<WeatherDay>() );
+        adapter = new AdapterListItemForecast( getActivity(), new ArrayList<WeatherDay>() );
 
         ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
         listView.setAdapter(adapter);
@@ -59,6 +59,7 @@ public class ForecastFragment extends Fragment {
                 //String forecast = adapter.getItem(position);
                 Intent intent = new Intent( getActivity(), DetailActivity.class );
                 intent.putExtra(Intent.EXTRA_TEXT, "teste");
+                intent.putExtra( "data", (WeatherDay) adapter.getItem( position ) );
                 startActivity(intent);
                 //Toast.makeText(getActivity(), "whether: " + forecast, Toast.LENGTH_SHORT).show();
             }

@@ -1,9 +1,11 @@
 package com.luizcarlos.sunshine.model;
 
+import java.io.Serializable;
+
 /**
  * Created by luizcarlos on 26/08/14.
  */
-public class WeatherDay
+public class WeatherDay implements Serializable
 {
     private String day;
     private String sesson;

@@ -7,9 +7,10 @@ import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 
 import com.luizcarlos.sunshine.R;
-import com.luizcarlos.sunshine.adapters.ListItemForecast;
+import com.luizcarlos.sunshine.adapters.AdapterListItemForecast;
 import com.luizcarlos.sunshine.model.WeatherDay;
 import com.luizcarlos.sunshine.utils.LogUtils;
+import com.luizcarlos.sunshine.utils.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,6 +24,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -35,9 +37,9 @@ public class FetchWeatherTask extends AsyncTask<String, Void, ArrayList<WeatherD
     private final static String TAG = FetchWeatherTask.class.getSimpleName();
 
     private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
-    private ListItemForecast adapter;
+    private AdapterListItemForecast adapter;
 
-    public FetchWeatherTask( ListItemForecast adapter) {
+    public FetchWeatherTask( AdapterListItemForecast adapter) {
         this.adapter = adapter;
     }
 
@@ -162,6 +164,27 @@ public class FetchWeatherTask extends AsyncTask<String, Void, ArrayList<WeatherD
         return format.format(date).toString();
     }
 
+    private String getReadableDateDay( long time )
+    {
+        Calendar calendarToday = Calendar.getInstance();
+        // Because the API returns a unix timestamp (measured in seconds),
+        // it must be converted to milliseconds in order to be converted to valid date.
+        Date date = new Date(time * 1000);
+        Calendar calendarDay = Utils.dateToCalendar( date );
+
+        Context context = adapter.getContext();
+        int result = calendarDay.get( Calendar.DAY_OF_WEEK ) - calendarToday.get( Calendar.DAY_OF_WEEK );
+
+        //verifca se os dias são iguais
+        if ( calendarToday.get( Calendar.DAY_OF_WEEK ) == calendarDay.get( Calendar.DAY_OF_WEEK ) )
+            return context.getString( R.string.today );
+        else if ( result == 1  ) // verifica se a diferenças dos dias são de apenas uma dia.
+            return context.getString( R.string.tomorrow );
+        else
+            return new SimpleDateFormat("EEEE").format( date ).toString();
+
+    }
+
     /**
      * Prepare the weather high/lows for presentation.
      */
@@ -252,7 +275,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, ArrayList<WeatherD
             // into something human-readable, since most people won't read "1400356800" as
             // "this saturday".
             long dateTime = dayForecast.getLong(OWM_DATETIME);
-            day = getReadableDateString(dateTime);
+            day = getReadableDateDay( dateTime ); //getReadableDateString(dateTime);
             weatherDay.setDay( day );
 
             // description is in a child array called "weather", which is 1 element long.
@@ -267,7 +290,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, ArrayList<WeatherD
             double low = temperatureObject.getDouble(OWM_MIN);
 
             weatherDay.setMaxTemp( formatTemperature( high ) );
-            weatherDay.setMinTemp( formatTemperature( low ) );
+            weatherDay.setMinTemp(formatTemperature(low));
 
             resultData.add( weatherDay );
         }
