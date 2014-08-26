@@ -23,13 +23,13 @@ public class WeatherDbHelper extends SQLiteOpenHelper
 
         // Create a table to hold locations.  A location consists of the string supplied in the
         // location setting, the city name, and the latitude and longitude
-        final String SQL_CREATE_LOCATION_TABLE = "CREATE TABLE " + LocationEntry.TABLE_NAME + " (" +
-                LocationEntry._ID + " INTEGER PRIMARY KEY, " +
-                LocationEntry.COLUMN_LOCATION_SETTING  + " TEXT UNIQUE NOT NULL, " +
-                LocationEntry.COLUMN_CITY_NAME + " TEXT NOT NULL, " +
-                LocationEntry.COLUMN_COORD_LAT + " REAL NOT NULL, " +
-                LocationEntry.COLUMN_COORD_LONG + " REAL NOT NULL, " +
-                "UNIQUE (" + LocationEntry.COLUMN_LOCATION_SETTING + ") ON CONFLICT IGNORE" +
+        final String SQL_CREATE_LOCATION_TABLE = "CREATE TABLE " + WeatherContract.LocationEntry.TABLE_NAME + " (" +
+                WeatherContract.LocationEntry._ID + " INTEGER PRIMARY KEY, " +
+                WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING  + " TEXT UNIQUE NOT NULL, " +
+                WeatherContract.LocationEntry.COLUMN_CITY_NAME + " TEXT NOT NULL, " +
+                WeatherContract.LocationEntry.COLUMN_COORD_LAT + " REAL NOT NULL, " +
+                WeatherContract.LocationEntry.COLUMN_COORD_LONG + " REAL NOT NULL, " +
+                "UNIQUE (" + WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING + ") ON CONFLICT IGNORE" +
                 " );";
 
         // TBD
@@ -59,7 +59,7 @@ public class WeatherDbHelper extends SQLiteOpenHelper
 
         // Set up the location column as a foreign key to location table.
         " FOREIGN KEY (" + WeatherContract.WeatherEntry.COLUMN_LOC_KEY + ") REFERENCES " +
-        LocationEntry.TABLE_NAME + " (" + LocationEntry._ID + "), " +
+        WeatherContract.LocationEntry.TABLE_NAME + " (" + WeatherContract.LocationEntry._ID + "), " +
 
         // To assure the application have just one weather entry per day
         // per location, it's created a UNIQUE constraint with REPLACE strategy
@@ -78,7 +78,7 @@ public class WeatherDbHelper extends SQLiteOpenHelper
         // It does NOT depend on the version number for your application.
         // If you want to update the schema without wiping data, commenting out the next 2 lines
         // should be your top priority before modifying this method.
-        db.execSQL("DROP TABLE IF EXISTS " + LocationEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + WeatherContract.LocationEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + WeatherContract.WeatherEntry.TABLE_NAME);
         onCreate(db);
     }

@@ -15,18 +15,16 @@ import java.util.Set;
 /**
  * Created by luizcarlos on 14/08/14.
  */
-public class TestDB extends AndroidTestCase {
+public class TestProvider extends AndroidTestCase {
 
-    public static final String LOG_TAG = TestDB.class.getSimpleName();
+    public static final String LOG_TAG = TestProvider.class.getSimpleName();
 
-    public void testCreateDb() throws Throwable
+    public void testDeleteDb() throws Throwable
     {
         mContext.deleteDatabase(WeatherDbHelper.DATABASE_NAME);
-        SQLiteDatabase db = new WeatherDbHelper( mContext ).getWritableDatabase();
-        assertEquals( true, db.isOpen() );
     }
 
-    public void testInsertReadDB()
+    public void testInsertReadProvider()
     {
         // If there's an error in those massive SQL table creation Strings,
         // errors will be thrown here when you try to get a writable database.
@@ -46,16 +44,23 @@ public class TestDB extends AndroidTestCase {
         // the round trip.
 
         // A cursor is your primary interface to the query results.
-        Cursor cursor = db.query(
-                WeatherContract.LocationEntry.TABLE_NAME,  // Table to Query
-                null, // all columns
-                null, // Columns for the "where" clause
-                null, // Values for the "where" clause
-                null, // columns to group by
-                null, // columns to filter by row groups
-                null // sort order
+        Cursor cursor = mContext.getContentResolver().query(
+                WeatherContract.LocationEntry.CONTENT_URI,
+                null, // leaving "columns" null just returns all the columns.
+                null, // cols for "where" clause
+                null, // values for "where" clause
+                null  // sort order
         );
+        validateCursor(cursor, testValues);
 
+        // Now see if we can successfully query if we include the row id
+        cursor = mContext.getContentResolver().query(
+                WeatherContract.LocationEntry.buildLocationUri(locationRowId),
+                null, // leaving "columns" null just returns all the columns.
+                null, // cols for "where" clause
+                null, // values for "where" clause
+                null  // sort order
+        );
         validateCursor(cursor, testValues);
 
         // Fantastic.  Now that we have a location, add some weather!
@@ -79,6 +84,39 @@ public class TestDB extends AndroidTestCase {
 
         dbHelper.close();
     }
+
+    public void testGetType() {
+        // content://com.example.android.sunshine.app/weather/
+        String type = mContext.getContentResolver().getType(WeatherContract.WeatherEntry.CONTENT_URI);
+        // vnd.android.cursor.dir/com.example.android.sunshine.app/weather
+        assertEquals(WeatherContract.WeatherEntry.CONTENT_TYPE, type);
+
+        String testLocation = "94074";
+        // content://com.example.android.sunshine.app/weather/94074
+        type = mContext.getContentResolver().getType(
+                WeatherContract.WeatherEntry.buildWeatherLocation(testLocation));
+        // vnd.android.cursor.dir/com.example.android.sunshine.app/weather
+        assertEquals(WeatherContract.WeatherEntry.CONTENT_TYPE, type);
+
+        String testDate = "20140612";
+        // content://com.example.android.sunshine.app/weather/94074/20140612
+        type = mContext.getContentResolver().getType(
+                WeatherContract.WeatherEntry.buildWeatherLocationWithDate(testLocation, testDate));
+        // vnd.android.cursor.item/com.example.android.sunshine.app/weather
+        assertEquals(WeatherContract.WeatherEntry.CONTENT_ITEM_TYPE, type);
+
+        // content://com.example.android.sunshine.app/location/
+        type = mContext.getContentResolver().getType(WeatherContract.LocationEntry.CONTENT_URI);
+        // vnd.android.cursor.dir/com.example.android.sunshine.app/location
+        assertEquals(WeatherContract.LocationEntry.CONTENT_TYPE, type);
+
+        // content://com.example.android.sunshine.app/location/1
+        type = mContext.getContentResolver().getType(WeatherContract.LocationEntry.buildLocationUri(1L));
+        // vnd.android.cursor.item/com.example.android.sunshine.app/location
+        assertEquals(WeatherContract.LocationEntry.CONTENT_ITEM_TYPE, type);
+
+    }
+
 
     private ContentValues createNorthPoleLocationValues()
     {
@@ -123,5 +161,6 @@ public class TestDB extends AndroidTestCase {
 
         return weatherValues;
     }
+
 
 }
