@@ -5,9 +5,10 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
-import android.widget.ArrayAdapter;
 
 import com.luizcarlos.sunshine.R;
+import com.luizcarlos.sunshine.adapters.ListItemForecast;
+import com.luizcarlos.sunshine.model.WeatherDay;
 import com.luizcarlos.sunshine.utils.LogUtils;
 
 import org.json.JSONArray;
@@ -21,26 +22,27 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
 /**
  * Created by luizcarlos on 25/07/14.
  */
-public class FetchWeatherTask extends AsyncTask<String, Void, String[]>
+public class FetchWeatherTask extends AsyncTask<String, Void, ArrayList<WeatherDay>>
 {
 
     private final static String TAG = FetchWeatherTask.class.getSimpleName();
 
     private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
-    private ArrayAdapter<String> adapter;
+    private ListItemForecast adapter;
 
-    public FetchWeatherTask( ArrayAdapter<String> adapter) {
+    public FetchWeatherTask( ListItemForecast adapter) {
         this.adapter = adapter;
     }
 
     @Override
-    protected String[] doInBackground(String... params)
+    protected ArrayList<WeatherDay> doInBackground(String... params)
     {
 
         if ( params.length == 0 ) return null;
@@ -137,14 +139,14 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]>
     }
 
     @Override
-    protected void onPostExecute(String[] result) {
+    protected void onPostExecute( ArrayList<WeatherDay> daysWeather ) {
 
-        if ( result != null )
+        if ( daysWeather != null )
         {
             adapter.clear();
-            //adapter.addAll( Arrays.asList(result) );
-            for( String str : result )
-                adapter.add( str );
+            adapter.addAll( daysWeather );
+            /*for( String str : result )
+                adapter.add( str );*/
         }
     }
 
@@ -191,6 +193,27 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]>
         return highLowStr;
     }
 
+    private String formatTemperature( double temp )
+    {
+        Context context = adapter.getContext();
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences( context );
+
+        String unitType = sharedPreferences.getString(
+                context.getString(R.string.pref_units_key),
+                context.getString(R.string.pref_units_metric) );
+
+        if (unitType.equals( context.getString(R.string.pref_units_imperial) ))
+            temp = (temp * 1.8) + 32;
+        else if (! unitType.equals(context.getString(R.string.pref_units_metric) ))
+            LogUtils.logInfo(TAG, "unidade de medida não encontrada.");
+
+        // For presentation, assume the user doesn't care about tenths of a degree.
+        long roundedTemp = Math.round( temp );
+
+        return String.format( "%d°", roundedTemp );
+    }
+
     /**
      * Take the String representing the complete forecast in JSON Format and
      * pull out the data we need to construct the Strings needed for the wireframes.
@@ -198,7 +221,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]>
      * Fortunately parsing is easy:  constructor takes the JSON string and converts it
      * into an Object hierarchy for us.
      */
-    private String[] getWeatherDataFromJson(String forecastJsonStr, int numDays)
+    private ArrayList<WeatherDay> getWeatherDataFromJson(String forecastJsonStr, int numDays)
             throws JSONException {
 
         // These are the names of the JSON objects that need to be extracted.
@@ -213,12 +236,14 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]>
         JSONObject forecastJson = new JSONObject(forecastJsonStr);
         JSONArray weatherArray = forecastJson.getJSONArray(OWM_LIST);
 
-        String[] resultStrs = new String[numDays];
+        ArrayList<WeatherDay> resultData = new ArrayList<WeatherDay>();
         for(int i = 0; i < weatherArray.length(); i++) {
+
+            WeatherDay weatherDay = new WeatherDay();
+
             // For now, using the format "Day, description, hi/low"
             String day;
             String description;
-            String highAndLow;
 
             // Get the JSON object representing the day
             JSONObject dayForecast = weatherArray.getJSONObject(i);
@@ -228,10 +253,12 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]>
             // "this saturday".
             long dateTime = dayForecast.getLong(OWM_DATETIME);
             day = getReadableDateString(dateTime);
+            weatherDay.setDay( day );
 
             // description is in a child array called "weather", which is 1 element long.
             JSONObject weatherObject = dayForecast.getJSONArray(OWM_WEATHER).getJSONObject(0);
             description = weatherObject.getString(OWM_DESCRIPTION);
+            weatherDay.setDescription( description );
 
             // Temperatures are in a child object called "temp".  Try not to name variables
             // "temp" when working with temperature.  It confuses everybody.
@@ -239,10 +266,12 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]>
             double high = temperatureObject.getDouble(OWM_MAX);
             double low = temperatureObject.getDouble(OWM_MIN);
 
-            highAndLow = formatHighLows(high, low);
-            resultStrs[i] = day + " - " + description + " - " + highAndLow;
+            weatherDay.setMaxTemp( formatTemperature( high ) );
+            weatherDay.setMinTemp( formatTemperature( low ) );
+
+            resultData.add( weatherDay );
         }
 
-        return resultStrs;
+        return resultData;
     }
 }

@@ -1,12 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
 
-    <TextView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/list_item_forecast_textview"
-        android:layout_width="match_parent"
+    <ImageView
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_margin="28dp"
+        android:src="@drawable/ic_launcher"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:minHeight="?android:attr/listPreferredItemHeight"
-        android:text="Today - Sunny - 24/09"
-        android:textSize="20sp"
-        android:gravity="center_vertical"
-    />
+        android:orientation="vertical"
+        android:layout_gravity="center"
+        android:minWidth="175dp">
+        <TextView
+            android:id="@+id/text_day"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Sunday"
+            android:textSize="22sp"/>
+        <TextView
+            android:id="@+id/text_sesson"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Summer"
+            android:textSize="14sp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="center">
+        <TextView
+            android:id="@+id/temp_max"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="14°"
+            android:textSize="22sp"/>
+        <TextView
+            android:id="@+id/temp_min"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="04°"
+            android:textSize="14sp"
+            android:gravity="center"/>
+    </LinearLayout>
+
+</LinearLayout>

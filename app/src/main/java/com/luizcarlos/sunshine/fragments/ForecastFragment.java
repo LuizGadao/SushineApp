@@ -12,11 +12,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.luizcarlos.sunshine.DetailActivity;
 import com.luizcarlos.sunshine.R;
+import com.luizcarlos.sunshine.adapters.ListItemForecast;
+import com.luizcarlos.sunshine.model.WeatherDay;
 import com.luizcarlos.sunshine.tasks.FetchWeatherTask;
 import com.luizcarlos.sunshine.utils.LogUtils;
 
@@ -28,7 +29,7 @@ import java.util.ArrayList;
 public class ForecastFragment extends Fragment {
 
     private static final String LOG_TAG = ForecastFragment.class.getSimpleName();
-    private ArrayAdapter<String> adapter;
+    private ListItemForecast adapter;
 
     public ForecastFragment() {
     }
@@ -47,7 +48,7 @@ public class ForecastFragment extends Fragment {
         list.add("Wednesday - Sunny - 88/63");
         list.add("Satarday - Sunny - 88/63");*/
 
-        adapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item_forecast, list);
+        adapter = new ListItemForecast( getActivity(), new ArrayList<WeatherDay>() );
 
         ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
         listView.setAdapter(adapter);
@@ -55,9 +56,9 @@ public class ForecastFragment extends Fragment {
         listView.setOnItemClickListener( new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String forecast = adapter.getItem(position);
+                //String forecast = adapter.getItem(position);
                 Intent intent = new Intent( getActivity(), DetailActivity.class );
-                intent.putExtra(Intent.EXTRA_TEXT, forecast);
+                intent.putExtra(Intent.EXTRA_TEXT, "teste");
                 startActivity(intent);
                 //Toast.makeText(getActivity(), "whether: " + forecast, Toast.LENGTH_SHORT).show();
             }
@@ -101,6 +102,6 @@ public class ForecastFragment extends Fragment {
         FetchWeatherTask fetchWeatherTask = new FetchWeatherTask(adapter);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity().getBaseContext());
         String location = prefs.getString(getString(R.string.pref_location_key), getString(R.string.pref_location_default));
-        fetchWeatherTask.execute(location);
+        fetchWeatherTask.execute( location );
     }
 }
