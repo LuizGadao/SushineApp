@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.luizcarlos.sunshine.R;
@@ -21,6 +22,9 @@ public class AdapterListItemForecast extends BaseAdapter
     private final Context context;
     private LayoutInflater inflater;
     private ArrayList<WeatherDay> daysWeather;
+
+    private static final int VIEW_TYPE_TODAY = 0;
+
 
     public AdapterListItemForecast(Context context, ArrayList<WeatherDay> daysWeather)
     {
@@ -44,26 +48,27 @@ public class AdapterListItemForecast extends BaseAdapter
     }
 
     @Override
-    public View getView(int position, View convetView, ViewGroup parent) {
+    public View getView(int position, View convertView, ViewGroup parent) {
 
         ViewHoder holder;
 
         if ( inflater == null )
             inflater = (LayoutInflater) context.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
-        if ( convetView == null )
+        if ( convertView == null )
         {
-            convetView = inflater.inflate( R.layout.list_item_forecast, null );
+           convertView = inflater.inflate( getViewType( position ) , null);
 
             holder = new ViewHoder();
-            holder.day = (TextView) convetView.findViewById( R.id.text_day );
-            holder.sesson = (TextView) convetView.findViewById( R.id.text_sesson );
-            holder.maxTemp = (TextView) convetView.findViewById( R.id.temp_max );
-            holder.minTemp = (TextView) convetView.findViewById( R.id.temp_min );
+            holder.iconWeather = (ImageView) convertView.findViewById( R.id.image_weather );
+            holder.day = (TextView) convertView.findViewById( R.id.text_day );
+            holder.sesson = (TextView) convertView.findViewById( R.id.text_sesson );
+            holder.maxTemp = (TextView) convertView.findViewById( R.id.temp_max );
+            holder.minTemp = (TextView) convertView.findViewById( R.id.temp_min );
 
-            convetView.setTag( holder );
+            convertView.setTag(holder);
         }
         else
-            holder = (ViewHoder) convetView.getTag();
+            holder = (ViewHoder) convertView.getTag();
 
         WeatherDay weatherDay = daysWeather.get( position );
         holder.day.setText( weatherDay.getDay() );
@@ -71,7 +76,12 @@ public class AdapterListItemForecast extends BaseAdapter
         holder.maxTemp.setText( weatherDay.getMaxTemp() );
         holder.minTemp.setText( weatherDay.getMinTemp() );
 
-        return convetView;
+        return convertView;
+    }
+
+    private int getViewType( int position )
+    {
+        return position == VIEW_TYPE_TODAY ? R.layout.list_item_forecast_today : R.layout.list_item_forecast;
     }
 
     public void clear()
@@ -98,7 +108,7 @@ public class AdapterListItemForecast extends BaseAdapter
 
     static class ViewHoder
     {
-        //ImageView iconWeather;
+        ImageView iconWeather;
         TextView day;
         TextView sesson;
         TextView maxTemp;

@@ -232,9 +232,9 @@ public class FetchWeatherTask extends AsyncTask<String, Void, ArrayList<WeatherD
             LogUtils.logInfo(TAG, "unidade de medida não encontrada.");
 
         // For presentation, assume the user doesn't care about tenths of a degree.
-        long roundedTemp = Math.round( temp );
+        double roundedTemp = Math.round( temp );
 
-        return String.format( "%d°", roundedTemp );
+        return context.getString( R.string.format_temperature, roundedTemp );
     }
 
     /**
@@ -255,6 +255,8 @@ public class FetchWeatherTask extends AsyncTask<String, Void, ArrayList<WeatherD
         final String OWM_MIN = "min";
         final String OWM_DATETIME = "dt";
         final String OWM_DESCRIPTION = "main";
+        final String OWN_HUMIDITY = "humidity";
+        final String OWN_PRESSURE = "pressure";
 
         JSONObject forecastJson = new JSONObject(forecastJsonStr);
         JSONArray weatherArray = forecastJson.getJSONArray(OWM_LIST);
@@ -290,7 +292,9 @@ public class FetchWeatherTask extends AsyncTask<String, Void, ArrayList<WeatherD
             double low = temperatureObject.getDouble(OWM_MIN);
 
             weatherDay.setMaxTemp( formatTemperature( high ) );
-            weatherDay.setMinTemp(formatTemperature(low));
+            weatherDay.setMinTemp( formatTemperature(low) );
+            weatherDay.setHumidity( dayForecast.getDouble( OWN_HUMIDITY ) );
+            weatherDay.setPressure( dayForecast.getDouble( OWN_PRESSURE ) );
 
             resultData.add( weatherDay );
         }

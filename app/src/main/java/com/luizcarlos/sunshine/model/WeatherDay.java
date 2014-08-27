@@ -12,6 +12,9 @@ public class WeatherDay implements Serializable
     private String maxTemp;
     private String minTemp;
     private String description;
+    private double humidity;
+    private double pressure;
+    private String windy;
 
     public WeatherDay(String day, String sesson, String maxTemp, String minTemp) {
         this.day = day;
@@ -70,5 +73,29 @@ public class WeatherDay implements Serializable
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public double getHumidity() {
+        return humidity;
+    }
+
+    public void setHumidity(double humidity) {
+        this.humidity = humidity;
+    }
+
+    public double getPressure() {
+        return pressure;
+    }
+
+    public void setPressure(double pressure) {
+        this.pressure = pressure;
+    }
+
+    public String getWindy() {
+        return windy;
+    }
+
+    public void setWindy(String windy) {
+        this.windy = windy;
     }
 }

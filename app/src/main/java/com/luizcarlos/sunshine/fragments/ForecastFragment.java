@@ -59,7 +59,7 @@ public class ForecastFragment extends Fragment {
                 //String forecast = adapter.getItem(position);
                 Intent intent = new Intent( getActivity(), DetailActivity.class );
                 intent.putExtra(Intent.EXTRA_TEXT, "teste");
-                intent.putExtra( "data", (WeatherDay) adapter.getItem( position ) );
+                intent.putExtra( "data_day", (WeatherDay) adapter.getItem( position ) );
                 startActivity(intent);
                 //Toast.makeText(getActivity(), "whether: " + forecast, Toast.LENGTH_SHORT).show();
             }
@@ -84,7 +84,6 @@ public class ForecastFragment extends Fragment {
         {
             case R.id.action_refresh:
                 LogUtils.logInfo( LOG_TAG, "click-item-action-search" );
-
                 updateLocation();
                 return true;
             default:

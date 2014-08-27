@@ -15,21 +15,21 @@
 
 
         <TextView
-            android:id="@+id/text_today"
+            android:id="@id/text_day"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="22sp"
             android:text="Today, December 7"/>
 
         <TextView
-            android:id="@+id/text_today_temp"
+            android:id="@id/temp_max"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="72sp"
             android:text="40°"/>
 
         <TextView
-            android:id="@+id/text_today_temp_min"
+            android:id="@id/temp_min"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="36sp"
@@ -45,13 +45,14 @@
         android:layout_gravity="center_horizontal">
 
         <ImageView
-            android:id="@+id/image_weather"
+            android:id="@id/image_weather"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:background="#ccc"/>
+            android:src="@drawable/ic_launcher"/>
 
 
         <TextView
+            android:id="@id/text_sesson"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Summer"
