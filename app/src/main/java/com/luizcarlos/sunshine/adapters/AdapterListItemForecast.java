@@ -1,6 +1,7 @@
 package com.luizcarlos.sunshine.adapters;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -71,6 +72,9 @@ public class AdapterListItemForecast extends BaseAdapter
             holder = (ViewHoder) convertView.getTag();
 
         WeatherDay weatherDay = daysWeather.get( position );
+        Drawable drawable = getWetherIcon( position, daysWeather.get( position ).getId() );
+
+        holder.iconWeather.setImageDrawable( drawable );
         holder.day.setText( weatherDay.getDay() );
         holder.sesson.setText( weatherDay.getDescription() );
         holder.maxTemp.setText( weatherDay.getMaxTemp() );
@@ -82,6 +86,14 @@ public class AdapterListItemForecast extends BaseAdapter
     private int getViewType( int position )
     {
         return position == VIEW_TYPE_TODAY ? R.layout.list_item_forecast_today : R.layout.list_item_forecast;
+    }
+
+    private Drawable getWetherIcon( int positon, int id )
+    {
+        int iconId = positon == VIEW_TYPE_TODAY ?
+                WeatherDay.getArtResourceForWeatherCondition( id ) : WeatherDay.getIconResourceForWeatherCondition( id );
+
+        return getContext().getResources().getDrawable( iconId );
     }
 
     public void clear()

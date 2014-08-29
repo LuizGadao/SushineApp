@@ -182,7 +182,6 @@ public class FetchWeatherTask extends AsyncTask<String, Void, ArrayList<WeatherD
             return context.getString( R.string.tomorrow );
         else
             return new SimpleDateFormat("EEEE").format( date ).toString();
-
     }
 
     /**
@@ -257,6 +256,9 @@ public class FetchWeatherTask extends AsyncTask<String, Void, ArrayList<WeatherD
         final String OWM_DESCRIPTION = "main";
         final String OWN_HUMIDITY = "humidity";
         final String OWN_PRESSURE = "pressure";
+        final String OWN_DEGREES = "deg";
+        final String OWN_SPEED = "speed";
+        final String OWN_ID = "id";
 
         JSONObject forecastJson = new JSONObject(forecastJsonStr);
         JSONArray weatherArray = forecastJson.getJSONArray(OWM_LIST);
@@ -279,26 +281,65 @@ public class FetchWeatherTask extends AsyncTask<String, Void, ArrayList<WeatherD
             long dateTime = dayForecast.getLong(OWM_DATETIME);
             day = getReadableDateDay( dateTime ); //getReadableDateString(dateTime);
             weatherDay.setDay( day );
+            weatherDay.setDate( new Date( dateTime * 1000 ) );
 
             // description is in a child array called "weather", which is 1 element long.
             JSONObject weatherObject = dayForecast.getJSONArray(OWM_WEATHER).getJSONObject(0);
             description = weatherObject.getString(OWM_DESCRIPTION);
             weatherDay.setDescription( description );
+            weatherDay.setId( weatherObject.getInt( OWN_ID ) );
 
             // Temperatures are in a child object called "temp".  Try not to name variables
             // "temp" when working with temperature.  It confuses everybody.
             JSONObject temperatureObject = dayForecast.getJSONObject(OWM_TEMPERATURE);
             double high = temperatureObject.getDouble(OWM_MAX);
             double low = temperatureObject.getDouble(OWM_MIN);
+            double speed = dayForecast.getDouble( OWN_SPEED );
+            double deg = dayForecast.getDouble( OWN_DEGREES );
+
+            float speedF = Float.parseFloat( speed + "" );
+            float degF = Float.parseFloat(deg + "");
 
             weatherDay.setMaxTemp( formatTemperature( high ) );
             weatherDay.setMinTemp( formatTemperature(low) );
             weatherDay.setHumidity( dayForecast.getDouble( OWN_HUMIDITY ) );
             weatherDay.setPressure( dayForecast.getDouble( OWN_PRESSURE ) );
+            weatherDay.setSpeed( speed );
+            weatherDay.setDegree( deg );
 
-            resultData.add( weatherDay );
+            //TODO REFACTOR
+            weatherDay.setWindy( getFormattedWind( adapter.getContext(), speedF, degF ) );
+
+            resultData.add(weatherDay);
         }
 
         return resultData;
+    }
+
+    public static String getFormattedWind( Context context, float windSpeed, float degrees ) {
+        int windFormat = R.string.format_wind_kmh;
+
+        // From wind direction in degrees, determine compass direction as a string (e.g NW)
+        // You know what's fun, writing really long if/else statements with tons of possible
+        // conditions.  Seriously, try it!
+        String direction = "Unknown";
+        if (degrees >= 337.5 || degrees < 22.5) {
+            direction = "N";
+        } else if (degrees >= 22.5 && degrees < 67.5) {
+            direction = "NE";
+        } else if (degrees >= 67.5 && degrees < 112.5) {
+            direction = "E";
+        } else if (degrees >= 112.5 && degrees < 157.5) {
+            direction = "SE";
+        } else if (degrees >= 157.5 && degrees < 202.5) {
+            direction = "S";
+        } else if (degrees >= 202.5 && degrees < 247.5) {
+            direction = "SW";
+        } else if (degrees >= 247.5 && degrees < 292.5) {
+            direction = "W";
+        } else if (degrees >= 292.5 || degrees < 22.5) {
+            direction = "NW";
+        }
+        return String.format(context.getString(windFormat), windSpeed, direction);
     }
 }

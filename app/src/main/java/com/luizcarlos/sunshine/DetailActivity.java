@@ -16,6 +16,9 @@ import android.widget.TextView;
 
 import com.luizcarlos.sunshine.model.WeatherDay;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class DetailActivity extends ActionBarActivity {
 
     private String stringExtra;
@@ -90,8 +93,11 @@ public class DetailActivity extends ActionBarActivity {
 
             String stringExtra = getActivity().getIntent().getStringExtra(Intent.EXTRA_TEXT);
             WeatherDay weatherDay = (WeatherDay) getActivity().getIntent().getSerializableExtra( "data_day" );
+            Date date = weatherDay.getDate();
+            String dateDetail = new SimpleDateFormat("MMMM, d").format( date ).toString();
 
             TextView textDay = (TextView) rootView.findViewById( R.id.text_detail_day );
+            TextView textDetailDate = (TextView) rootView.findViewById( R.id.text_detail_date );
             TextView textWeather = (TextView) rootView.findViewById( R.id.text_sesson_day );
             TextView tempMax = (TextView) rootView.findViewById( R.id.temp_max_day );
             TextView tempMin = (TextView) rootView.findViewById( R.id.temp_min_day );
@@ -100,11 +106,13 @@ public class DetailActivity extends ActionBarActivity {
             TextView windy = (TextView) rootView.findViewById( R.id.text_windy );
 
             textDay.setText( weatherDay.getDay() );
+            textDetailDate.setText( dateDetail );
             textWeather.setText( weatherDay.getDescription() );
             tempMax.setText( weatherDay.getMaxTemp() );
             tempMin.setText( weatherDay.getMinTemp() );
             umidty.setText( context.getString( R.string.format_humidity, weatherDay.getHumidity() ) );
             pressure.setText( context.getString( R.string.format_pressure, weatherDay.getPressure() ) );
+            windy.setText( weatherDay.getWindy() );
             return rootView;
         }
     }

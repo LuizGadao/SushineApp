@@ -1,4 +1,4 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -9,99 +9,106 @@
     android:orientation="vertical"
     tools:context="com.luizcarlos.sunshine.DetailActivity$PlaceholderFragment">
 
-    <TextView
-        android:id="@+id/text_detail_day"
-        android:text="@string/today"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="24sp"/>
-
-    <TextView
-        android:id="@+id/text_detail_date"
-        android:text="December, 2014"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="16sp"
-        android:textColor="#646464"/>
-    
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="60dp"
-        android:gravity="center">
+        android:orientation="vertical">
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/text_detail_day"
+            android:text="@string/today"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginRight="30dp"
-            >
-    
-            <TextView
-                android:id="@+id/temp_max_day"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="72sp"
-                android:text="40°"/>
-    
-            <TextView
-                android:id="@+id/temp_min_day"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="36sp"
-                android:text="20°"
-                android:layout_marginLeft="12dp"/>
-    
-        </LinearLayout>
-        
-        <LinearLayout
+            android:textSize="24sp"/>
+
+        <TextView
+            android:id="@+id/text_detail_date"
+            android:text="December, 2014"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:textSize="16sp"
+            android:textColor="#646464"/>
 
-            <ImageView
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:src="@drawable/ic_launcher"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="60dp"
+            android:gravity="center">
 
-            <TextView
-                android:id="@+id/text_sesson_day"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Summer"
-                android:textSize="22sp"
-                android:layout_gravity="center"
-                android:layout_marginTop="10dp"
-                android:textColor="#646464"/>
+                android:orientation="vertical"
+                android:layout_marginRight="30dp"
+                >
+
+                <TextView
+                    android:id="@+id/temp_max_day"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="72sp"
+                    android:text="40°"/>
+
+                <TextView
+                    android:id="@+id/temp_min_day"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="36sp"
+                    android:text="20°"
+                    android:layout_marginLeft="12dp"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:src="@drawable/ic_launcher"/>
+
+                <TextView
+                    android:id="@+id/text_sesson_day"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Summer"
+                    android:textSize="22sp"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="10dp"
+                    android:textColor="#646464"/>
+            </LinearLayout>
+
         </LinearLayout>
+
+        <TextView
+            android:layout_marginTop="40dp"
+            android:id="@+id/text_umidity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Humidty:"
+            android:textSize="22sp"
+            android:paddingBottom="4dp"/>
+
+        <TextView
+            android:id="@+id/text_pressure"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pressure:"
+            android:textSize="22sp"
+            android:paddingBottom="4dp"/>
+
+        <TextView
+            android:id="@+id/text_windy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Windy:"
+            android:paddingBottom="4dp"
+            android:textSize="22sp"
+            android:textStyle=""/>
 
     </LinearLayout>
 
-    <TextView
-        android:layout_marginTop="40dp"
-        android:id="@+id/text_umidity"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Humidty:"
-        android:textSize="22sp"
-        android:paddingBottom="4dp"/>
-
-    <TextView
-        android:id="@+id/text_pressure"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Pressure:"
-        android:textSize="22sp"
-        android:paddingBottom="4dp"/>
-
-    <TextView
-        android:id="@+id/text_windy"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Windy:"
-        android:paddingBottom="4dp"
-        android:textSize="22sp"
-        android:textStyle=""/>
-
-</LinearLayout>
+</ScrollView>
