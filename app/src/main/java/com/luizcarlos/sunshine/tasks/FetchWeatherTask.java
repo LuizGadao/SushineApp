@@ -5,7 +5,9 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
+import android.view.View;
 
+import com.luizcarlos.sunshine.DetailActivity;
 import com.luizcarlos.sunshine.R;
 import com.luizcarlos.sunshine.adapters.AdapterListItemForecast;
 import com.luizcarlos.sunshine.model.WeatherDay;
@@ -38,6 +40,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, ArrayList<WeatherD
 
     private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
     private AdapterListItemForecast adapter;
+    public DetailActivity.DetailFragment detailFragment;
 
     public FetchWeatherTask( AdapterListItemForecast adapter) {
         this.adapter = adapter;
@@ -150,6 +153,10 @@ public class FetchWeatherTask extends AsyncTask<String, Void, ArrayList<WeatherD
             /*for( String str : result )
                 adapter.add( str );*/
         }
+
+        if ( detailFragment != null && detailFragment.isVisibleRootView() == false )
+            detailFragment.setupView( daysWeather.get( 0 ), View.VISIBLE );
+
     }
 
     /* The date/time conversion code is going to be moved outside the asynctask later,
@@ -178,7 +185,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, ArrayList<WeatherD
         //verifca se os dias são iguais
         if ( calendarToday.get( Calendar.DAY_OF_WEEK ) == calendarDay.get( Calendar.DAY_OF_WEEK ) )
             return context.getString( R.string.today );
-        else if ( result == 1  ) // verifica se a diferenças dos dias são de apenas uma dia.
+        else if ( result == 1  ) // verifica se a diferenças dos dias é de apenas uma dia.
             return context.getString( R.string.tomorrow );
         else
             return new SimpleDateFormat("EEEE").format( date ).toString();

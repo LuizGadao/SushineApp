@@ -30,6 +30,7 @@ public class ForecastFragment extends Fragment {
 
     private static final String LOG_TAG = ForecastFragment.class.getSimpleName();
     private AdapterListItemForecast adapter;
+    private DetailActivity.DetailFragment detailFragment;
 
     public ForecastFragment() {
     }
@@ -41,12 +42,6 @@ public class ForecastFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_my, container, false);
 
         ArrayList<String> list = new ArrayList<String>();
-        /*list.add("Today - Sunny - 88/63");®
-        list.add("Monday - Sunny - 88/63");
-        list.add("sunday - Sunny - 88/63");
-        list.add("Friday - Sunny - 88/63");
-        list.add("Wednesday - Sunny - 88/63");
-        list.add("Satarday - Sunny - 88/63");*/
 
         adapter = new AdapterListItemForecast( getActivity(), new ArrayList<WeatherDay>() );
 
@@ -54,14 +49,25 @@ public class ForecastFragment extends Fragment {
         listView.setAdapter(adapter);
 
         listView.setOnItemClickListener( new AdapterView.OnItemClickListener() {
+
+
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //String forecast = adapter.getItem(position);
-                Intent intent = new Intent( getActivity(), DetailActivity.class );
-                intent.putExtra(Intent.EXTRA_TEXT, "teste");
-                intent.putExtra( "data_day", (WeatherDay) adapter.getItem( position ) );
-                startActivity(intent);
-                //Toast.makeText(getActivity(), "whether: " + forecast, Toast.LENGTH_SHORT).show();
+
+                WeatherDay weatherDay = (WeatherDay) adapter.getItem(position);
+
+                if( ! getResources().getBoolean( R.bool.isTablet ) ) {
+
+                    //String forecast = adapter.getItem(position);
+                    Intent intent = new Intent(getActivity(), DetailActivity.class);
+                    intent.putExtra(Intent.EXTRA_TEXT, "teste");
+                    intent.putExtra(DetailActivity.DATA_DAY, weatherDay );
+                    startActivity(intent);
+                    //Toast.makeText(getActivity(), "whether: " + forecast, Toast.LENGTH_SHORT).show();
+                }else
+                {
+                    detailFragment.setupView( weatherDay, View.VISIBLE );
+                }
             }
         });
 
@@ -99,9 +105,15 @@ public class ForecastFragment extends Fragment {
     }
 
     private void updateLocation() {
-        FetchWeatherTask fetchWeatherTask = new FetchWeatherTask(adapter);
+        FetchWeatherTask fetchWeatherTask = new FetchWeatherTask( adapter );
+        fetchWeatherTask.detailFragment = detailFragment;
+
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity().getBaseContext());
         String location = prefs.getString(getString(R.string.pref_location_key), getString(R.string.pref_location_default));
         fetchWeatherTask.execute( location );
+    }
+
+    public void setDetailFragment(DetailActivity.DetailFragment detailFragment) {
+        this.detailFragment = detailFragment;
     }
 }

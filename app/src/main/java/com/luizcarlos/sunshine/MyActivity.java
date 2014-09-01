@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,12 +23,28 @@ public class MyActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my);
         if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new ForecastFragment())
-                    .commit();
+
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+
+            if ( findViewById( R.id.weather_detail_container ) == null )
+            {
+                fragmentTransaction
+                        .add(R.id.fragment_forecast, new ForecastFragment());
+            }
+            else //tablet
+            {
+
+                ForecastFragment forecastFragment = new ForecastFragment();
+                DetailActivity.DetailFragment detailFragment = new DetailActivity.DetailFragment();
+                forecastFragment.setDetailFragment( detailFragment );
+
+                fragmentTransaction.add( R.id.fragment_forecast, forecastFragment );
+                fragmentTransaction.add( R.id.weather_detail_container, detailFragment);
+            }
+
+            fragmentTransaction.commit();
         }
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

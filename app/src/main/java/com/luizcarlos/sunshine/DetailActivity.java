@@ -2,6 +2,7 @@ package com.luizcarlos.sunshine;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
@@ -12,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.luizcarlos.sunshine.model.WeatherDay;
@@ -21,6 +23,7 @@ import java.util.Date;
 
 public class DetailActivity extends ActionBarActivity {
 
+    public static final String DATA_DAY = "data-day";
     private String stringExtra;
 
     @Override
@@ -28,8 +31,14 @@ public class DetailActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
         if (savedInstanceState == null) {
+
+            Bundle bundle = new Bundle();
+            bundle.putSerializable( DATA_DAY, getIntent().getSerializableExtra( DATA_DAY ) );
+            DetailFragment detailFragment = new DetailFragment();
+            detailFragment.setArguments( bundle );
+
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new PlaceholderFragment())
+                    .add(R.id.weather_detail_container, detailFragment)
                     .commit();
         }
 
@@ -78,23 +87,43 @@ public class DetailActivity extends ActionBarActivity {
     /**
      * A placeholder fragment containing a simple view.
      */
-    public static class PlaceholderFragment extends Fragment {
+    public static class DetailFragment extends Fragment {
 
-        public PlaceholderFragment() {
+        private View rootView;
+
+        public DetailFragment() {
             setHasOptionsMenu(true);
         }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
+            rootView = inflater.inflate(R.layout.fragment_detail, container, false);
+
+            WeatherDay weatherDay = null;
+
+            if ( getArguments() != null && getArguments().getSerializable( DATA_DAY ) != null )
+                weatherDay = (WeatherDay) getArguments().getSerializable( DATA_DAY );
+
+            if ( weatherDay != null )
+            {
+                setupView( weatherDay, View.VISIBLE );
+            }
+            else
+                rootView.setVisibility( View.INVISIBLE );
+
+            return rootView;
+        }
+
+        public void setupView( WeatherDay weatherDay, int visible ) {
 
             Context context = getActivity().getBaseContext();
-
-            String stringExtra = getActivity().getIntent().getStringExtra(Intent.EXTRA_TEXT);
-            WeatherDay weatherDay = (WeatherDay) getActivity().getIntent().getSerializableExtra( "data_day" );
             Date date = weatherDay.getDate();
             String dateDetail = new SimpleDateFormat("MMMM, d").format( date ).toString();
+
+            ImageView imageView = (ImageView) rootView.findViewById( R.id.image_weather_detail );
+            Drawable drawable = context.getResources().getDrawable( WeatherDay.getArtResourceForWeatherCondition(weatherDay.getId()) );
+            imageView.setImageDrawable( drawable );
 
             TextView textDay = (TextView) rootView.findViewById( R.id.text_detail_day );
             TextView textDetailDate = (TextView) rootView.findViewById( R.id.text_detail_date );
@@ -113,7 +142,16 @@ public class DetailActivity extends ActionBarActivity {
             umidty.setText( context.getString( R.string.format_humidity, weatherDay.getHumidity() ) );
             pressure.setText( context.getString( R.string.format_pressure, weatherDay.getPressure() ) );
             windy.setText( weatherDay.getWindy() );
-            return rootView;
+
+            rootView.setVisibility( visible );
         }
+
+        public boolean isVisibleRootView()
+        {
+            return rootView.getVisibility() == View.VISIBLE? true : false;
+        }
+
     }
+
+
 }
