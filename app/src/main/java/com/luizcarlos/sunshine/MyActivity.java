@@ -9,14 +9,18 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.luizcarlos.sunshine.fragments.ForecastFragment;
+import com.luizcarlos.sunshine.model.WeatherDay;
 import com.luizcarlos.sunshine.utils.LogUtils;
 
 
-public class MyActivity extends ActionBarActivity {
+public class MyActivity extends ActionBarActivity implements ForecastFragment.Callback {
 
     private final static String TAG = MyActivity.class.getSimpleName();
+    private ForecastFragment forecastFragment;
+    private DetailActivity.DetailFragment detailFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,9 +38,8 @@ public class MyActivity extends ActionBarActivity {
             else //tablet
             {
 
-                ForecastFragment forecastFragment = new ForecastFragment();
-                DetailActivity.DetailFragment detailFragment = new DetailActivity.DetailFragment();
-                forecastFragment.setDetailFragment( detailFragment );
+                forecastFragment = new ForecastFragment();
+                detailFragment = new DetailActivity.DetailFragment();
 
                 fragmentTransaction.add( R.id.fragment_forecast, forecastFragment );
                 fragmentTransaction.add( R.id.weather_detail_container, detailFragment);
@@ -91,6 +94,24 @@ public class MyActivity extends ActionBarActivity {
             startActivity(intent);
         else
             LogUtils.logInfo(TAG, "Android não consegue resolver a intent.");
+
+    }
+
+
+    @Override
+    public void onItemSelected(WeatherDay weatherDay)
+    {
+        if( ! getResources().getBoolean( R.bool.isTablet ) ) {
+
+            //String forecast = adapter.getItem(position);
+            Intent intent = new Intent( this , DetailActivity.class);
+            intent.putExtra(DetailActivity.DATA_DAY, weatherDay );
+            startActivity(intent);
+            //Toast.makeText(getActivity(), "whether: " + forecast, Toast.LENGTH_SHORT).show();
+        }else // tablet
+        {
+            detailFragment.setupView( weatherDay, View.VISIBLE );
+        }
 
     }
 }

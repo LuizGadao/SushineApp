@@ -1,7 +1,7 @@
 package com.luizcarlos.sunshine.fragments;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -14,7 +14,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.luizcarlos.sunshine.DetailActivity;
 import com.luizcarlos.sunshine.R;
 import com.luizcarlos.sunshine.adapters.AdapterListItemForecast;
 import com.luizcarlos.sunshine.model.WeatherDay;
@@ -29,10 +28,16 @@ import java.util.ArrayList;
 public class ForecastFragment extends Fragment {
 
     private static final String LOG_TAG = ForecastFragment.class.getSimpleName();
+    private static final int NO_ITEM_SELECTED = -1;
+
     private AdapterListItemForecast adapter;
-    private DetailActivity.DetailFragment detailFragment;
+    private int currentItemListViesSelected = NO_ITEM_SELECTED;
 
     public ForecastFragment() {
+    }
+
+    public interface Callback{
+        public void onItemSelected( WeatherDay weatherDay );
     }
 
     @Override
@@ -44,6 +49,26 @@ public class ForecastFragment extends Fragment {
         ArrayList<String> list = new ArrayList<String>();
 
         adapter = new AdapterListItemForecast( getActivity(), new ArrayList<WeatherDay>() );
+        adapter.registerDataSetObserver( new DataSetObserver() {
+            @Override
+            public void onChanged() {
+                super.onChanged();
+
+
+                int item = currentItemListViesSelected == NO_ITEM_SELECTED ? 0 : currentItemListViesSelected;
+                WeatherDay weatherDay = (WeatherDay) adapter.getItem( item );
+                ((Callback)getActivity()).onItemSelected( weatherDay );
+
+                LogUtils.logInfo( LOG_TAG, "adapter data change" );
+                LogUtils.logInfo( LOG_TAG, "data: " + weatherDay.getDay() );
+            }
+
+            @Override
+            public void onInvalidated() {
+                super.onInvalidated();
+            }
+        });
+
 
         ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
         listView.setAdapter(adapter);
@@ -55,19 +80,9 @@ public class ForecastFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 WeatherDay weatherDay = (WeatherDay) adapter.getItem(position);
+                ((Callback)getActivity()).onItemSelected( weatherDay );
 
-                if( ! getResources().getBoolean( R.bool.isTablet ) ) {
-
-                    //String forecast = adapter.getItem(position);
-                    Intent intent = new Intent(getActivity(), DetailActivity.class);
-                    intent.putExtra(Intent.EXTRA_TEXT, "teste");
-                    intent.putExtra(DetailActivity.DATA_DAY, weatherDay );
-                    startActivity(intent);
-                    //Toast.makeText(getActivity(), "whether: " + forecast, Toast.LENGTH_SHORT).show();
-                }else
-                {
-                    detailFragment.setupView( weatherDay, View.VISIBLE );
-                }
+                currentItemListViesSelected = position;
             }
         });
 
@@ -100,20 +115,14 @@ public class ForecastFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-
         updateLocation();
     }
 
     private void updateLocation() {
         FetchWeatherTask fetchWeatherTask = new FetchWeatherTask( adapter );
-        fetchWeatherTask.detailFragment = detailFragment;
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity().getBaseContext());
         String location = prefs.getString(getString(R.string.pref_location_key), getString(R.string.pref_location_default));
         fetchWeatherTask.execute( location );
-    }
-
-    public void setDetailFragment(DetailActivity.DetailFragment detailFragment) {
-        this.detailFragment = detailFragment;
     }
 }

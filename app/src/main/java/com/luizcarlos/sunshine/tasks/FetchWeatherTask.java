@@ -5,9 +5,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
-import android.view.View;
 
-import com.luizcarlos.sunshine.DetailActivity;
 import com.luizcarlos.sunshine.R;
 import com.luizcarlos.sunshine.adapters.AdapterListItemForecast;
 import com.luizcarlos.sunshine.model.WeatherDay;
@@ -40,7 +38,6 @@ public class FetchWeatherTask extends AsyncTask<String, Void, ArrayList<WeatherD
 
     private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
     private AdapterListItemForecast adapter;
-    public DetailActivity.DetailFragment detailFragment;
 
     public FetchWeatherTask( AdapterListItemForecast adapter) {
         this.adapter = adapter;
@@ -153,9 +150,6 @@ public class FetchWeatherTask extends AsyncTask<String, Void, ArrayList<WeatherD
             /*for( String str : result )
                 adapter.add( str );*/
         }
-
-        if ( detailFragment != null && detailFragment.isVisibleRootView() == false )
-            detailFragment.setupView( daysWeather.get( 0 ), View.VISIBLE );
 
     }
 
