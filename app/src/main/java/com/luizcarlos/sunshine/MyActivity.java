@@ -9,7 +9,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.luizcarlos.sunshine.fragments.ForecastFragment;
 import com.luizcarlos.sunshine.model.WeatherDay;
@@ -20,7 +19,6 @@ public class MyActivity extends ActionBarActivity implements ForecastFragment.Ca
 
     private final static String TAG = MyActivity.class.getSimpleName();
     private ForecastFragment forecastFragment;
-    private DetailActivity.DetailFragment detailFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,12 +35,8 @@ public class MyActivity extends ActionBarActivity implements ForecastFragment.Ca
             }
             else //tablet
             {
-
                 forecastFragment = new ForecastFragment();
-                detailFragment = new DetailActivity.DetailFragment();
-
                 fragmentTransaction.add( R.id.fragment_forecast, forecastFragment );
-                fragmentTransaction.add( R.id.weather_detail_container, detailFragment);
             }
 
             fragmentTransaction.commit();
@@ -110,7 +104,17 @@ public class MyActivity extends ActionBarActivity implements ForecastFragment.Ca
             //Toast.makeText(getActivity(), "whether: " + forecast, Toast.LENGTH_SHORT).show();
         }else // tablet
         {
-            detailFragment.setupView( weatherDay, View.VISIBLE );
+
+            DetailActivity.DetailFragment detailFragment = new DetailActivity.DetailFragment();
+            Bundle args = new Bundle();
+            args.putSerializable( DetailActivity.DATA_DAY, weatherDay );
+            detailFragment.setArguments( args );
+
+
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction
+                    .replace( R.id.weather_detail_container, detailFragment)
+                    .commit();
         }
 
     }

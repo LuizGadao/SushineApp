@@ -10,6 +10,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.ShareActionProvider;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,46 +45,6 @@ public class DetailActivity extends ActionBarActivity {
 
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate( R.menu.detail, menu );
-
-        MenuItem item = menu.findItem(R.id.action_share);
-
-        ShareActionProvider shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(item);
-
-        if (shareActionProvider != null)
-            shareActionProvider.setShareIntent(easyShare());
-
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        switch (item.getItemId())
-        {
-            case R.id.action_settings:
-                startActivity( new Intent( getBaseContext(), SettingsActivity.class ) );
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    private Intent easyShare()
-    {
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-        intent.setType("text/plain");
-        String strShare = getIntent().getStringExtra(Intent.EXTRA_TEXT) + " #SunshineApp";
-
-        intent.putExtra(Intent.EXTRA_TEXT, strShare);
-
-        return intent;
-    }
-
     /**
      * A placeholder fragment containing a simple view.
      */
@@ -93,6 +54,46 @@ public class DetailActivity extends ActionBarActivity {
 
         public DetailFragment() {
             setHasOptionsMenu(true);
+        }
+
+        @Override
+        public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+            super.onCreateOptionsMenu(menu, inflater);
+
+            inflater.inflate( R.menu.detail, menu );
+
+            MenuItem item = menu.findItem(R.id.action_share);
+
+            ShareActionProvider shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(item);
+
+            if (shareActionProvider != null)
+                shareActionProvider.setShareIntent(easyShare());
+        }
+
+        @Override
+        public boolean onOptionsItemSelected(MenuItem item) {
+
+            switch (item.getItemId())
+            {
+                case R.id.action_settings:
+                    startActivity( new Intent( getActivity(), SettingsActivity.class ) );
+                    return true;
+
+                default:
+                    return super.onOptionsItemSelected(item);
+            }
+        }
+
+        private Intent easyShare()
+        {
+            Intent intent = new Intent(Intent.ACTION_SEND);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+            intent.setType("text/plain");
+            String strShare = " #SunshineApp";
+
+            intent.putExtra(Intent.EXTRA_TEXT, strShare);
+
+            return intent;
         }
 
         @Override

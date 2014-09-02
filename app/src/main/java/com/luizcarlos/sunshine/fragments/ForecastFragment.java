@@ -31,7 +31,7 @@ public class ForecastFragment extends Fragment {
     private static final int NO_ITEM_SELECTED = -1;
 
     private AdapterListItemForecast adapter;
-    private int currentItemListViesSelected = NO_ITEM_SELECTED;
+    private int currentItemListViewSelected = NO_ITEM_SELECTED;
 
     public ForecastFragment() {
     }
@@ -49,26 +49,27 @@ public class ForecastFragment extends Fragment {
         ArrayList<String> list = new ArrayList<String>();
 
         adapter = new AdapterListItemForecast( getActivity(), new ArrayList<WeatherDay>() );
-        adapter.registerDataSetObserver( new DataSetObserver() {
-            @Override
-            public void onChanged() {
-                super.onChanged();
+        if ( getResources().getBoolean( R.bool.isTablet ) ) {
+            adapter.registerDataSetObserver(new DataSetObserver() {
+                @Override
+                public void onChanged() {
+                    super.onChanged();
 
+                    int item = currentItemListViewSelected == NO_ITEM_SELECTED ? 0 : currentItemListViewSelected;
 
-                int item = currentItemListViesSelected == NO_ITEM_SELECTED ? 0 : currentItemListViesSelected;
-                WeatherDay weatherDay = (WeatherDay) adapter.getItem( item );
-                ((Callback)getActivity()).onItemSelected( weatherDay );
+                    WeatherDay weatherDay = (WeatherDay) adapter.getItem(item);
+                    ((Callback) getActivity()).onItemSelected(weatherDay);
 
-                LogUtils.logInfo( LOG_TAG, "adapter data change" );
-                LogUtils.logInfo( LOG_TAG, "data: " + weatherDay.getDay() );
-            }
+                    LogUtils.logInfo(LOG_TAG, "adapter data change");
+                    LogUtils.logInfo(LOG_TAG, "data: " + weatherDay.getDay());
+                }
 
-            @Override
-            public void onInvalidated() {
-                super.onInvalidated();
-            }
-        });
-
+                @Override
+                public void onInvalidated() {
+                    super.onInvalidated();
+                }
+            });
+        }
 
         ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
         listView.setAdapter(adapter);
@@ -82,7 +83,7 @@ public class ForecastFragment extends Fragment {
                 WeatherDay weatherDay = (WeatherDay) adapter.getItem(position);
                 ((Callback)getActivity()).onItemSelected( weatherDay );
 
-                currentItemListViesSelected = position;
+                currentItemListViewSelected = position;
             }
         });
 
@@ -125,4 +126,6 @@ public class ForecastFragment extends Fragment {
         String location = prefs.getString(getString(R.string.pref_location_key), getString(R.string.pref_location_default));
         fetchWeatherTask.execute( location );
     }
+
+
 }
