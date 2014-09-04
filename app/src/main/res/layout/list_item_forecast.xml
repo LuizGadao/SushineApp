@@ -4,20 +4,26 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="@drawable/touch_selector">
+
+    <FrameLayout
+        android:layout_width="60dp"
+        android:layout_height="wrap_content">
 
     <ImageView
         android:id="@+id/image_weather"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_launcher"/>
+    </FrameLayout>
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_gravity="center"
-        android:layout_weight="1">
+        android:layout_weight="7">
         <TextView
             android:id="@+id/text_day"
             android:layout_width="match_parent"
@@ -29,11 +35,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Summer"
+            android:fontFamily="sans-serif-condensed"
             android:textSize="14sp"/>
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="5"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_gravity="center">
@@ -42,7 +50,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="14°"
-            android:textSize="22sp"/>
+            android:textSize="22sp"
+            android:gravity="center"/>
         <TextView
             android:id="@+id/temp_min"
             android:layout_width="match_parent"

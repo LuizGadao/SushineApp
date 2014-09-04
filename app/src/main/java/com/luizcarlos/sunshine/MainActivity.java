@@ -15,32 +15,32 @@ import com.luizcarlos.sunshine.model.WeatherDay;
 import com.luizcarlos.sunshine.utils.LogUtils;
 
 
-public class MyActivity extends ActionBarActivity implements ForecastFragment.Callback {
+public class MainActivity extends ActionBarActivity implements ForecastFragment.Callback {
 
-    private final static String TAG = MyActivity.class.getSimpleName();
-    private ForecastFragment forecastFragment;
+    private final static String TAG = MainActivity.class.getSimpleName();
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate( Bundle savedInstanceState ) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my);
-        if (savedInstanceState == null) {
 
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
 
-            if ( findViewById( R.id.weather_detail_container ) == null )
+            if ( findViewById( R.id.weather_detail_container ) != null )
             {
-                fragmentTransaction
-                        .add(R.id.fragment_forecast, new ForecastFragment());
+                //TABLET
+                if ( savedInstanceState != null ) {
+                    fragmentTransaction
+                            .replace(R.id.weather_detail_container, new DetailActivity.DetailFragment());
+                }
             }
-            else //tablet
+            else //
             {
-                forecastFragment = new ForecastFragment();
+                ForecastFragment forecastFragment = new ForecastFragment();
                 fragmentTransaction.add( R.id.fragment_forecast, forecastFragment );
             }
 
             fragmentTransaction.commit();
-        }
     }
 
     @Override
@@ -109,7 +109,6 @@ public class MyActivity extends ActionBarActivity implements ForecastFragment.Ca
             Bundle args = new Bundle();
             args.putSerializable( DetailActivity.DATA_DAY, weatherDay );
             detailFragment.setArguments( args );
-
 
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction

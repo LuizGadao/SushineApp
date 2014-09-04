@@ -22,7 +22,7 @@ import com.luizcarlos.sunshine.utils.LogUtils;
 
 import java.util.ArrayList;
 
-/**
+    /**
  * Created by luizcarlos on 25/07/14.
  */
 public class ForecastFragment extends Fragment {
@@ -48,7 +48,13 @@ public class ForecastFragment extends Fragment {
 
         ArrayList<String> list = new ArrayList<String>();
 
+        if ( savedInstanceState != null && savedInstanceState.containsKey( "item_selected" ) )
+            currentItemListViewSelected = savedInstanceState.getInt( "item_selected" );
+
         adapter = new AdapterListItemForecast( getActivity(), new ArrayList<WeatherDay>() );
+        final ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
+        listView.setAdapter(adapter);
+
         if ( getResources().getBoolean( R.bool.isTablet ) ) {
             adapter.registerDataSetObserver(new DataSetObserver() {
                 @Override
@@ -62,6 +68,8 @@ public class ForecastFragment extends Fragment {
 
                     LogUtils.logInfo(LOG_TAG, "adapter data change");
                     LogUtils.logInfo(LOG_TAG, "data: " + weatherDay.getDay());
+
+                    listView.setSelection( item );
                 }
 
                 @Override
@@ -71,8 +79,7 @@ public class ForecastFragment extends Fragment {
             });
         }
 
-        ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
-        listView.setAdapter(adapter);
+
 
         listView.setOnItemClickListener( new AdapterView.OnItemClickListener() {
 
@@ -127,5 +134,10 @@ public class ForecastFragment extends Fragment {
         fetchWeatherTask.execute( location );
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
 
+        outState.putInt( "item_selected", currentItemListViewSelected );
+    }
 }

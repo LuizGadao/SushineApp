@@ -11,11 +11,11 @@
     This layout is a two-pane layout for the Sunshine master/detail flow.
     -->
     <fragment
-        android:id="@id/fragment_forecast"
+        android:id="@+id/fragment_forecast"
         android:name="com.luizcarlos.sunshine.fragments.ForecastFragment"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="2"
+        android:layout_weight="3"
         tools:layout="@android:layout/list_content" />
 
     <FrameLayout

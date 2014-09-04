@@ -85,12 +85,15 @@ public class AdapterListItemForecast extends BaseAdapter
 
     private int getViewType( int position )
     {
-        return position == VIEW_TYPE_TODAY ? R.layout.list_item_forecast_today : R.layout.list_item_forecast;
+        boolean isTablet = getContext().getResources().getBoolean( R.bool.isTablet );
+        return position == VIEW_TYPE_TODAY && isTablet == false ?
+                R.layout.list_item_forecast_today : R.layout.list_item_forecast;
     }
 
     private Drawable getWetherIcon( int positon, int id )
     {
-        int iconId = positon == VIEW_TYPE_TODAY ?
+        boolean isTablet = getContext().getResources().getBoolean( R.bool.isTablet );
+        int iconId = positon == VIEW_TYPE_TODAY && isTablet == false ?
                 WeatherDay.getArtResourceForWeatherCondition( id ) : WeatherDay.getIconResourceForWeatherCondition( id );
 
         return getContext().getResources().getDrawable( iconId );
