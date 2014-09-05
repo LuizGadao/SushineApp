@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 
+import com.luizcarlos.sunshine.App;
 import com.luizcarlos.sunshine.R;
 import com.luizcarlos.sunshine.adapters.AdapterListItemForecast;
 import com.luizcarlos.sunshine.model.WeatherDay;
@@ -190,20 +191,18 @@ public class FetchWeatherTask extends AsyncTask<String, Void, ArrayList<WeatherD
      */
     private String formatHighLows(double high, double low) {
 
-        Context context = adapter.getContext();
-
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences( context );
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences( App.getApplication() );
 
         String unitType = sharedPreferences.getString(
-                context.getString(R.string.pref_units_key),
-                context.getString(R.string.pref_units_metric) );
+                App.getApplication().getString(R.string.pref_units_key),
+                App.getApplication().getString(R.string.pref_units_metric) );
 
-        if (unitType.equals( context.getString(R.string.pref_units_imperial) ))
+        if (unitType.equals( App.getApplication().getString(R.string.pref_units_imperial) ))
         {
             low = (low * 1.8) + 32;
             high = (high * 1.8) + 32;
         }
-        else if (! unitType.equals(context.getString(R.string.pref_units_metric) ))
+        else if (! unitType.equals(App.getApplication().getString(R.string.pref_units_metric) ))
         {
             LogUtils.logInfo(TAG, "unidade de medida não encontrada.");
         }
@@ -218,23 +217,22 @@ public class FetchWeatherTask extends AsyncTask<String, Void, ArrayList<WeatherD
 
     private String formatTemperature( double temp )
     {
-        Context context = adapter.getContext();
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences( context );
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences( App.getApplication() );
 
         String unitType = sharedPreferences.getString(
-                context.getString(R.string.pref_units_key),
-                context.getString(R.string.pref_units_metric) );
+                App.getApplication().getString(R.string.pref_units_key),
+                App.getApplication().getString(R.string.pref_units_metric) );
 
-        if (unitType.equals( context.getString(R.string.pref_units_imperial) ))
+        if (unitType.equals( App.getApplication().getString(R.string.pref_units_imperial) ))
             temp = (temp * 1.8) + 32;
-        else if (! unitType.equals(context.getString(R.string.pref_units_metric) ))
+        else if (! unitType.equals(App.getApplication().getString(R.string.pref_units_metric) ))
             LogUtils.logInfo(TAG, "unidade de medida não encontrada.");
 
         // For presentation, assume the user doesn't care about tenths of a degree.
         double roundedTemp = Math.round( temp );
 
-        return context.getString( R.string.format_temperature, roundedTemp );
+        return App.getApplication().getString( R.string.format_temperature, roundedTemp );
     }
 
     /**
@@ -308,8 +306,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, ArrayList<WeatherD
             weatherDay.setSpeed( speed );
             weatherDay.setDegree( deg );
 
-            //TODO REFACTOR
-            weatherDay.setWindy( getFormattedWind( adapter.getContext(), speedF, degF ) );
+            weatherDay.setWindy( getFormattedWind( App.getApplication(), speedF, degF ) );
 
             resultData.add(weatherDay);
         }
