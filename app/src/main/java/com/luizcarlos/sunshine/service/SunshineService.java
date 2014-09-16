@@ -1,14 +1,17 @@
-package com.luizcarlos.sunshine.tasks;
+package com.luizcarlos.sunshine.service;
 
+import android.app.IntentService;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.os.AsyncTask;
+import android.os.Binder;
+import android.os.IBinder;
 import android.preference.PreferenceManager;
 
 import com.luizcarlos.sunshine.App;
 import com.luizcarlos.sunshine.R;
-import com.luizcarlos.sunshine.adapters.AdapterListItemForecast;
+import com.luizcarlos.sunshine.fragments.ForecastFragment;
 import com.luizcarlos.sunshine.model.WeatherDay;
 import com.luizcarlos.sunshine.utils.LogUtils;
 import com.luizcarlos.sunshine.utils.Utils;
@@ -27,26 +30,70 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 
-/**
- * Created by luizcarlos on 25/07/14.
- */
-public class FetchWeatherTask extends AsyncTask<String, Void, ArrayList<WeatherDay>>
-{
-    private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
-    private AdapterListItemForecast adapter;
+public class SunshineService extends IntentService {
+    private static final String LOG_TAG = SunshineService.class.getSimpleName();
+    public ArrayList<WeatherDay> weatherDataFromJson;
+    public Controller controller = new Controller();
+    public boolean enable;
 
-    public FetchWeatherTask( AdapterListItemForecast adapter) {
-        this.adapter = adapter;
+    public SunshineService() {
+        super("SunshineService");
     }
 
     @Override
-    protected ArrayList<WeatherDay> doInBackground(String... params)
+    public IBinder onBind(Intent intent) {
+        return controller;
+    }
+
+    @Override
+    public void onCreate() {
+        LogUtils.logInfo( LOG_TAG, "on-create" );
+        super.onCreate();
+        enable = true;
+    }
+
+    @Override
+    public void onStart(Intent intent, int startId) {
+        super.onStart(intent, startId);
+        LogUtils.logInfo( LOG_TAG, "on-start: " + startId );
+    }
+
+    @Override
+    protected void onHandleIntent(final Intent intent) {
+
+        /*new Thread(){
+            @Override
+            public void run() {
+
+                try {
+                    Thread.sleep(1000 * 5);
+
+                    String location = intent.getExtras().getString( App.getApplication().getString( R.string.pref_location_key ) );
+                    if ( location != null ) {
+                        weatherDataFromJson = loadUrl(location);
+                        LogUtils.logInfo( LOG_TAG, "loaded-data: " + weatherDataFromJson.size() );
+                        controller.forecastFragment.updateAdapter( weatherDataFromJson );
+                    }
+
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();*/
+
+        String location = intent.getExtras().getString( App.getApplication().getString( R.string.pref_location_key ) );
+        if ( location != null ) {
+            weatherDataFromJson = loadUrl(location);
+            LogUtils.logInfo( LOG_TAG, "loaded-data: " + weatherDataFromJson.size() );
+            controller.forecastFragment.updateAdapter( weatherDataFromJson );
+        }
+
+        enable = false;
+    }
+
+    private ArrayList<WeatherDay> loadUrl( String location )
     {
-
-        if ( params.length == 0 ) return null;
-
         // These two need to be declared outside the try/catch
         // so that they can be closed in the finally block.
         HttpURLConnection urlConnection = null;
@@ -71,15 +118,15 @@ public class FetchWeatherTask extends AsyncTask<String, Void, ArrayList<WeatherD
             final String DAYS_PARAM = "cnt";
 
             Uri buildUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
-                    .appendQueryParameter(QUERY_PARAM, params[0])
-                    //.appendQueryParameter(QUERY_PARAM2, params[1])
+                    .appendQueryParameter(QUERY_PARAM, location)
+                            //.appendQueryParameter(QUERY_PARAM2, params[1])
                     .appendQueryParameter(FORMAT_PARAM, format)
                     .appendQueryParameter(UNITS_PARAM, units)
                     .appendQueryParameter(DAYS_PARAM, Integer.toString(numDays))
                     .build();
 
             URL url = new URL(buildUri.toString());
-            LogUtils.logInfo( LOG_TAG, "build uri: " + url.toString());
+            LogUtils.logInfo(LOG_TAG, "build uri: " + url.toString());
 
             // Create the request to OpenWeatherMap, and open the connection
             urlConnection = (HttpURLConnection) url.openConnection();
@@ -91,6 +138,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, ArrayList<WeatherD
             StringBuffer buffer = new StringBuffer();
             if (inputStream == null) {
                 // Nothing to do.
+                LogUtils.logInfo( LOG_TAG, "inputstream is null." );
                 return null;
             }
             reader = new BufferedReader(new InputStreamReader(inputStream));
@@ -105,6 +153,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, ArrayList<WeatherD
 
             if (buffer.length() == 0) {
                 // Stream was empty.  No point in parsing.
+                LogUtils.logInfo( LOG_TAG, "date is empty." );
                 return null;
             }
             forecastJsonStr = buffer.toString();
@@ -112,7 +161,6 @@ public class FetchWeatherTask extends AsyncTask<String, Void, ArrayList<WeatherD
             LogUtils.logError(LOG_TAG, "Error " + e.getMessage());
             // If the code didn't successfully get the weather data, there's no point in attemping
             // to parse it.
-            return null;
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
@@ -127,7 +175,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, ArrayList<WeatherD
         }
 
         try{
-            return getWeatherDataFromJson( forecastJsonStr, numDays );
+            return getWeatherDataFromJson(forecastJsonStr, numDays);
         }
         catch (JSONException e)
         {
@@ -138,99 +186,6 @@ public class FetchWeatherTask extends AsyncTask<String, Void, ArrayList<WeatherD
         return null;
     }
 
-    @Override
-    protected void onPostExecute( ArrayList<WeatherDay> daysWeather ) {
-
-        if ( daysWeather != null )
-        {
-            adapter.clear();
-            adapter.addAll( daysWeather );
-            /*for( String str : result )
-                adapter.add( str );*/
-        }
-
-    }
-
-    /* The date/time conversion code is going to be moved outside the asynctask later,
-         * so for convenience we're breaking it out into its own method now.
-         */
-    private String getReadableDateString(long time){
-        // Because the API returns a unix timestamp (measured in seconds),
-        // it must be converted to milliseconds in order to be converted to valid date.
-        Date date = new Date(time * 1000);
-        // format = new SimpleDateFormat("E, MMM d");
-        SimpleDateFormat format = new SimpleDateFormat("E, MMM, d", Locale.getDefault());
-        return format.format(date).toString();
-    }
-
-    private String getReadableDateDay( long time )
-    {
-        Calendar calendarToday = Calendar.getInstance();
-        // Because the API returns a unix timestamp (measured in seconds),
-        // it must be converted to milliseconds in order to be converted to valid date.
-        Date date = new Date(time * 1000);
-        Calendar calendarDay = Utils.dateToCalendar( date );
-
-        Context context = adapter.getContext();
-        int result = calendarDay.get( Calendar.DAY_OF_WEEK ) - calendarToday.get( Calendar.DAY_OF_WEEK );
-
-        //verifca se os dias são iguais
-        if ( calendarToday.get( Calendar.DAY_OF_WEEK ) == calendarDay.get( Calendar.DAY_OF_WEEK ) )
-            return context.getString( R.string.today );
-        else if ( result == 1  ) // verifica se a diferenças dos dias é de apenas uma dia.
-            return context.getString( R.string.tomorrow );
-        else
-            return new SimpleDateFormat("EEEE").format( date ).toString();
-    }
-
-    /**
-     * Prepare the weather high/lows for presentation.
-     */
-    private String formatHighLows(double high, double low) {
-
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences( App.getApplication() );
-
-        String unitType = sharedPreferences.getString(
-                App.getApplication().getString(R.string.pref_units_key),
-                App.getApplication().getString(R.string.pref_units_metric) );
-
-        if (unitType.equals( App.getApplication().getString(R.string.pref_units_imperial) ))
-        {
-            low = (low * 1.8) + 32;
-            high = (high * 1.8) + 32;
-        }
-        else if (! unitType.equals(App.getApplication().getString(R.string.pref_units_metric) ))
-        {
-            LogUtils.logInfo(LOG_TAG, "unidade de medida não encontrada.");
-        }
-
-        // For presentation, assume the user doesn't care about tenths of a degree.
-        long roundedHigh = Math.round(high);
-        long roundedLow = Math.round(low);
-
-        String highLowStr = roundedHigh + "/" + roundedLow;
-        return highLowStr;
-    }
-
-    private String formatTemperature( double temp )
-    {
-
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences( App.getApplication() );
-
-        String unitType = sharedPreferences.getString(
-                App.getApplication().getString(R.string.pref_units_key),
-                App.getApplication().getString(R.string.pref_units_metric) );
-
-        if (unitType.equals( App.getApplication().getString(R.string.pref_units_imperial) ))
-            temp = (temp * 1.8) + 32;
-        else if (! unitType.equals(App.getApplication().getString(R.string.pref_units_metric) ))
-            LogUtils.logInfo(LOG_TAG, "unidade de medida não encontrada.");
-
-        // For presentation, assume the user doesn't care about tenths of a degree.
-        double roundedTemp = Math.round( temp );
-
-        return App.getApplication().getString( R.string.format_temperature, roundedTemp );
-    }
 
     /**
      * Take the String representing the complete forecast in JSON Format and
@@ -337,4 +292,51 @@ public class FetchWeatherTask extends AsyncTask<String, Void, ArrayList<WeatherD
         }
         return String.format(context.getString(windFormat), windSpeed, direction);
     }
+
+    private String formatTemperature( double temp )
+    {
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getApplication());
+
+        String unitType = sharedPreferences.getString(
+                App.getApplication().getString(R.string.pref_units_key),
+                App.getApplication().getString(R.string.pref_units_metric) );
+
+        if (unitType.equals( App.getApplication().getString(R.string.pref_units_imperial) ))
+            temp = (temp * 1.8) + 32;
+        else if (! unitType.equals(App.getApplication().getString(R.string.pref_units_metric) ))
+            LogUtils.logInfo(LOG_TAG, "unidade de medida não encontrada.");
+
+        // For presentation, assume the user doesn't care about tenths of a degree.
+        double roundedTemp = Math.round( temp );
+
+        return App.getApplication().getString( R.string.format_temperature, roundedTemp );
+    }
+
+    private String getReadableDateDay( long time )
+    {
+        Calendar calendarToday = Calendar.getInstance();
+        // Because the API returns a unix timestamp (measured in seconds),
+        // it must be converted to milliseconds in order to be converted to valid date.
+        Date date = new Date(time * 1000);
+        Calendar calendarDay = Utils.dateToCalendar(date);
+
+        Context context = App.getApplication();
+        int result = calendarDay.get( Calendar.DAY_OF_WEEK ) - calendarToday.get( Calendar.DAY_OF_WEEK );
+
+        //verifca se os dias são iguais
+        if ( calendarToday.get( Calendar.DAY_OF_WEEK ) == calendarDay.get( Calendar.DAY_OF_WEEK ) )
+            return context.getString( R.string.today );
+        else if ( result == 1  ) // verifica se a diferenças dos dias é de apenas uma dia.
+            return context.getString( R.string.tomorrow );
+        else
+            return new SimpleDateFormat("EEEE").format( date ).toString();
+    }
+
+    public class Controller extends Binder
+    {
+        public SunshineService getService(){ return SunshineService.this;  }
+        public ForecastFragment forecastFragment;
+    }
+
 }

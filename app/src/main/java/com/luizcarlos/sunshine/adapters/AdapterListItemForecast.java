@@ -19,7 +19,7 @@ import java.util.ArrayList;
  */
 public class AdapterListItemForecast extends BaseAdapter
 {
-
+    private final static String LOG_TAG = AdapterListItemForecast.class.getSimpleName();
     private final Context context;
     private LayoutInflater inflater;
     private ArrayList<WeatherDay> daysWeather;
@@ -51,30 +51,30 @@ public class AdapterListItemForecast extends BaseAdapter
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-        ViewHoder holder;
+        ViewHoder holder = null;
+        WeatherDay weatherDay = daysWeather.get( position );
 
         if ( inflater == null )
             inflater = (LayoutInflater) context.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
-        if ( convertView == null )
-        {
-           convertView = inflater.inflate( getViewType( position ) , null);
+
+
+            convertView = inflater.inflate(getViewType(position), parent, false);
+            convertView.setId( position );
 
             holder = new ViewHoder();
-            holder.iconWeather = (ImageView) convertView.findViewById( R.id.image_weather );
-            holder.day = (TextView) convertView.findViewById( R.id.text_day );
-            holder.sesson = (TextView) convertView.findViewById( R.id.text_sesson );
-            holder.maxTemp = (TextView) convertView.findViewById( R.id.temp_max );
-            holder.minTemp = (TextView) convertView.findViewById( R.id.temp_min );
+            holder.iconWeather = (ImageView) convertView.findViewById(R.id.image_weather);
+            holder.day = (TextView) convertView.findViewById(R.id.text_day);
+            holder.sesson = (TextView) convertView.findViewById(R.id.text_sesson);
+            holder.maxTemp = (TextView) convertView.findViewById(R.id.temp_max);
+            holder.minTemp = (TextView) convertView.findViewById(R.id.temp_min);
 
-            convertView.setTag(holder);
-        }
-        else
-            holder = (ViewHoder) convertView.getTag();
+            //convertView.setTag( holder );
 
-        WeatherDay weatherDay = daysWeather.get( position );
+
         Drawable drawable = getWetherIcon( position, daysWeather.get( position ).getId() );
-
         holder.iconWeather.setImageDrawable( drawable );
+
+        holder.iconWeather.setContentDescription( weatherDay.getDescription() );
         holder.day.setText( weatherDay.getDay() );
         holder.sesson.setText( weatherDay.getDescription() );
         holder.maxTemp.setText( weatherDay.getMaxTemp() );
@@ -93,9 +93,11 @@ public class AdapterListItemForecast extends BaseAdapter
     private Drawable getWetherIcon( int positon, int id )
     {
         boolean isTablet = getContext().getResources().getBoolean( R.bool.isTablet );
-        int iconId = positon == VIEW_TYPE_TODAY && isTablet == false ?
+        int iconId = 0;
+        iconId = (positon == VIEW_TYPE_TODAY && isTablet == false) ?
                 WeatherDay.getArtResourceForWeatherCondition( id ) : WeatherDay.getIconResourceForWeatherCondition( id );
 
+        //LogUtils.logInfo( LOG_TAG, "weather-icon: " + iconId );
         return getContext().getResources().getDrawable( iconId );
     }
 
@@ -118,6 +120,10 @@ public class AdapterListItemForecast extends BaseAdapter
 
     public Context getContext() {
         return context;
+    }
+
+    public ArrayList<WeatherDay> getData() {
+        return daysWeather;
     }
 
 

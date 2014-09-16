@@ -3,17 +3,17 @@
     package="com.luizcarlos.sunshine" >
 
     <application
+        android:name=".App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme"
-        android:name=".App">
+        android:theme="@style/AppTheme" >
         <activity
-            android:theme="@style/ForecastTheme"
             android:name=".MainActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -35,9 +35,20 @@
         </activity>
 
         <provider
-            android:authorities="com.luizcarlos.sunshine"
-            android:name=".data.WeatherProvider"/>
+            android:name=".data.WeatherProvider"
+            android:authorities="com.luizcarlos.sunshine" />
 
+        <service
+            android:name=".service.SunshineService"
+            android:enabled="true"
+            android:exported="false" >
+
+            <intent-filter>
+                <action android:name="INTENT_SERVICE"></action>
+                <category android:name="android.intent.category.DEFAULT"></category>
+            </intent-filter>
+
+        </service>
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />
