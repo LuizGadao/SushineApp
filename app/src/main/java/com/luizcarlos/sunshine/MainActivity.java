@@ -5,17 +5,17 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.luizcarlos.sunshine.fragments.ForecastFragment;
 import com.luizcarlos.sunshine.model.WeatherDay;
 import com.luizcarlos.sunshine.utils.LogUtils;
 
 
-public class MainActivity extends ActionBarActivity implements ForecastFragment.Callback {
+public class MainActivity extends ActionBarActivity implements Callback {
 
     private final static String TAG = MainActivity.class.getSimpleName();
 
@@ -24,23 +24,20 @@ public class MainActivity extends ActionBarActivity implements ForecastFragment.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my);
 
-            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-            if ( findViewById( R.id.weather_detail_container ) != null )
-            {
-                //TABLET
-                if ( savedInstanceState != null ) {
-                    fragmentTransaction
-                            .replace(R.id.weather_detail_container, new DetailActivity.DetailFragment());
-                }
+        if ( findViewById( R.id.weather_detail_container ) != null )
+        {
+            //TABLET
+            if ( savedInstanceState != null ) {
+                fragmentTransaction
+                        .replace(R.id.weather_detail_container, new DetailActivity.DetailFragment())
+                        .commit();
             }
-            else //
-            {
-                ForecastFragment forecastFragment = new ForecastFragment();
-                fragmentTransaction.add( R.id.fragment_forecast, forecastFragment );
-            }
+        }
 
-            fragmentTransaction.commit();
+        //ForecastFragment forecastFragment = (ForecastFragment) fragmentManager.findFragmentById( R.id.fragment_forecast );
     }
 
     @Override
@@ -87,7 +84,7 @@ public class MainActivity extends ActionBarActivity implements ForecastFragment.
         if ( intent.resolveActivity(getPackageManager()) != null )
             startActivity(intent);
         else
-            LogUtils.logInfo(TAG, "Android não consegue resolver a intent.");
+            LogUtils.info(TAG, "Android não consegue resolver a intent.");
 
     }
 

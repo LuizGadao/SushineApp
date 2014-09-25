@@ -1,14 +1,8 @@
 package com.luizcarlos.sunshine.fragments;
 
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
-import android.content.SharedPreferences;
 import android.database.DataSetObserver;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -18,32 +12,28 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
+import com.luizcarlos.sunshine.Callback;
 import com.luizcarlos.sunshine.R;
 import com.luizcarlos.sunshine.adapters.AdapterListItemForecast;
+import com.luizcarlos.sunshine.controller.ControllerSaveData;
 import com.luizcarlos.sunshine.model.WeatherDay;
-import com.luizcarlos.sunshine.service.SunshineService;
 import com.luizcarlos.sunshine.utils.LogUtils;
+import com.luizcarlos.sunshine.utils.Utils;
 
 import java.util.ArrayList;
 
     /**
  * Created by luizcarlos on 25/07/14.
  */
-public class ForecastFragment extends Fragment implements ServiceConnection {
+public class ForecastFragment extends Fragment {
 
     private static final String LOG_TAG = ForecastFragment.class.getSimpleName();
     private static final int NO_ITEM_SELECTED = -1;
 
     private AdapterListItemForecast adapter;
     private int currentItemListViewSelected = NO_ITEM_SELECTED;
-    private SunshineService.Controller controller;
-
-
-    public interface Callback{
-        public void onItemSelected( WeatherDay weatherDay );
-    }
+    private ControllerSaveData controllerSaveData;
 
     public ForecastFragment() { }
 
@@ -56,7 +46,6 @@ public class ForecastFragment extends Fragment implements ServiceConnection {
         String location = getString( R.string.pref_location_key );
         Intent intent = new Intent("INTENT_SERVICE");
         intent.putExtra( getString( R.string.pref_location_key ), location );
-        getActivity().bindService(intent, this, Context.BIND_AUTO_CREATE);
 
         if ( savedInstanceState != null && savedInstanceState.containsKey( "item_selected" ) ) {
             currentItemListViewSelected = savedInstanceState.getInt("item_selected");
@@ -77,8 +66,8 @@ public class ForecastFragment extends Fragment implements ServiceConnection {
                     WeatherDay weatherDay = (WeatherDay) adapter.getItem(item);
                     ((Callback) getActivity()).onItemSelected(weatherDay);
 
-                    LogUtils.logInfo(LOG_TAG, "adapter data change");
-                    LogUtils.logInfo(LOG_TAG, "data: " + weatherDay.getDay());
+                    LogUtils.info(LOG_TAG, "adapter data change");
+                    LogUtils.info(LOG_TAG, "data: " + weatherDay.getDay());
 
                     listView.setSelection( item );
                 }
@@ -121,8 +110,8 @@ public class ForecastFragment extends Fragment implements ServiceConnection {
         switch ( item.getItemId() )
         {
             case R.id.action_refresh:
-                LogUtils.logInfo( LOG_TAG, "click-item-action-search" );
-                updateLocation();
+                LogUtils.info(LOG_TAG, "click-item-action-search");
+                updateLocation( true );
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -133,63 +122,50 @@ public class ForecastFragment extends Fragment implements ServiceConnection {
     public void onStart() {
         super.onStart();
 
-        if ( adapter.getCount() == 0 )
-            updateLocation();
+        updateLocation( false );
     }
 
-    private void updateLocation() {
+    private void updateLocation( Boolean isRefresh ) {
         //FetchWeatherTask fetchWeatherTask = new FetchWeatherTask( adapter );
 
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity().getBaseContext());
-        String location = prefs.getString(getString(R.string.pref_location_key), getString(R.string.pref_location_default));
+        String location = Utils.getPreferenceLocation();
+
+        controllerSaveData = new ControllerSaveData( this, location, isRefresh );
+
         //fetchWeatherTask.execute( location );
 
+        /*
         Toast.makeText( getActivity(), "update location: " + location, Toast.LENGTH_LONG ).show();
+        LogUtils.info( LOG_TAG, "update-location" );
+
 
         Intent intent = new Intent("INTENT_SERVICE");
         intent.putExtra( getString( R.string.pref_location_key ), location );
 
         getActivity().startService(intent);
         getActivity().bindService(intent, this, Context.BIND_AUTO_CREATE);
-
-        LogUtils.logInfo( LOG_TAG, "update-location" );
+        */
     }
+
+
 
     public void updateAdapter( final ArrayList<WeatherDay> weatherDays )
     {
-        LogUtils.logInfo( LOG_TAG, "update-adapter" );
+        LogUtils.info(LOG_TAG, "update-adapter");
         getActivity().runOnUiThread( new Runnable() {
             @Override
             public void run() {
                 adapter.clear();
                 adapter.addAll( weatherDays );
             }
-        } );
-
-        Intent intent = new Intent("INTENT_SERVICE");
-        getActivity().stopService( intent );
-        getActivity().unbindService( this );
+        });
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        outState.putInt( "item_selected", currentItemListViewSelected );
+        outState.putInt("item_selected", currentItemListViewSelected);
     }
-
-    @Override
-    public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-        LogUtils.logInfo(LOG_TAG, "onServiceConnected");
-        controller = (SunshineService.Controller) iBinder;
-        controller.forecastFragment = this;
-    }
-
-    @Override
-    public void onServiceDisconnected(ComponentName componentName) {
-
-    }
-
-
 }

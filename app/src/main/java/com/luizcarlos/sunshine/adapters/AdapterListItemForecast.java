@@ -97,7 +97,7 @@ public class AdapterListItemForecast extends BaseAdapter
         iconId = (positon == VIEW_TYPE_TODAY && isTablet == false) ?
                 WeatherDay.getArtResourceForWeatherCondition( id ) : WeatherDay.getIconResourceForWeatherCondition( id );
 
-        //LogUtils.logInfo( LOG_TAG, "weather-icon: " + iconId );
+        //LogUtils.info( LOG_TAG, "weather-icon: " + iconId );
         return getContext().getResources().getDrawable( iconId );
     }
 

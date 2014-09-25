@@ -79,7 +79,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, ArrayList<WeatherD
                     .build();
 
             URL url = new URL(buildUri.toString());
-            LogUtils.logInfo( LOG_TAG, "build uri: " + url.toString());
+            LogUtils.info(LOG_TAG, "build uri: " + url.toString());
 
             // Create the request to OpenWeatherMap, and open the connection
             urlConnection = (HttpURLConnection) url.openConnection();
@@ -109,7 +109,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, ArrayList<WeatherD
             }
             forecastJsonStr = buffer.toString();
         } catch (IOException e) {
-            LogUtils.logError(LOG_TAG, "Error " + e.getMessage());
+            LogUtils.error(LOG_TAG, "Error " + e.getMessage());
             // If the code didn't successfully get the weather data, there's no point in attemping
             // to parse it.
             return null;
@@ -121,7 +121,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, ArrayList<WeatherD
                 try {
                     reader.close();
                 } catch (final IOException e) {
-                    LogUtils.logError(LOG_TAG, "Error closing stream " + e.getMessage());
+                    LogUtils.error(LOG_TAG, "Error closing stream " + e.getMessage());
                 }
             }
         }
@@ -131,7 +131,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, ArrayList<WeatherD
         }
         catch (JSONException e)
         {
-            LogUtils.logError(LOG_TAG, "error: " + e.getMessage());
+            LogUtils.error(LOG_TAG, "error: " + e.getMessage());
             e.printStackTrace();
         }
 
@@ -141,6 +141,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, ArrayList<WeatherD
     @Override
     protected void onPostExecute( ArrayList<WeatherDay> daysWeather ) {
 
+        LogUtils.info(LOG_TAG, "on-post-execute");
         if ( daysWeather != null )
         {
             adapter.clear();
@@ -201,7 +202,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, ArrayList<WeatherD
         }
         else if (! unitType.equals(App.getApplication().getString(R.string.pref_units_metric) ))
         {
-            LogUtils.logInfo(LOG_TAG, "unidade de medida não encontrada.");
+            LogUtils.info(LOG_TAG, "unidade de medida não encontrada.");
         }
 
         // For presentation, assume the user doesn't care about tenths of a degree.
@@ -224,7 +225,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, ArrayList<WeatherD
         if (unitType.equals( App.getApplication().getString(R.string.pref_units_imperial) ))
             temp = (temp * 1.8) + 32;
         else if (! unitType.equals(App.getApplication().getString(R.string.pref_units_metric) ))
-            LogUtils.logInfo(LOG_TAG, "unidade de medida não encontrada.");
+            LogUtils.info(LOG_TAG, "unidade de medida não encontrada.");
 
         // For presentation, assume the user doesn't care about tenths of a degree.
         double roundedTemp = Math.round( temp );
