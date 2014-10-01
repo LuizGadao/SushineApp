@@ -126,29 +126,22 @@ public class ForecastFragment extends Fragment {
     }
 
     private void updateLocation( Boolean isRefresh ) {
-        //FetchWeatherTask fetchWeatherTask = new FetchWeatherTask( adapter );
-
-
         String location = Utils.getPreferenceLocation();
-
         controllerSaveData = new ControllerSaveData( this, location, isRefresh );
 
-        //fetchWeatherTask.execute( location );
-
         /*
-        Toast.makeText( getActivity(), "update location: " + location, Toast.LENGTH_LONG ).show();
-        LogUtils.info( LOG_TAG, "update-location" );
+        Intent alarmIntent = new Intent(getActivity(), SunshineService.AlarmReceiver.class);
+        alarmIntent.putExtra(SunshineService.LOCATION_QUERY_EXTRA, Utils.getPreferenceLocation());
 
+        //Wrap in a pending intent which only fires once.
+        PendingIntent pi = PendingIntent.getBroadcast(getActivity(), 0,alarmIntent,PendingIntent.FLAG_ONE_SHOT);//getBroadcast(context, 0, i, 0);
 
-        Intent intent = new Intent("INTENT_SERVICE");
-        intent.putExtra( getString( R.string.pref_location_key ), location );
+        AlarmManager am = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
 
-        getActivity().startService(intent);
-        getActivity().bindService(intent, this, Context.BIND_AUTO_CREATE);
+        //Set the AlarmManager to wake up the system.
+        am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 5000, pi);
         */
     }
-
-
 
     public void updateAdapter( final ArrayList<WeatherDay> weatherDays )
     {

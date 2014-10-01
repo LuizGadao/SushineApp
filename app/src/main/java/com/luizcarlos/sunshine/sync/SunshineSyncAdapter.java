@@ -10,6 +10,7 @@ import android.content.SyncResult;
 import android.os.Bundle;
 
 import com.luizcarlos.sunshine.R;
+import com.luizcarlos.sunshine.utils.Utils;
 
 /**
  * Created by luizcarlos on 23/09/14.
@@ -18,13 +19,18 @@ import com.luizcarlos.sunshine.R;
 public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
     public final String LOG_TAG = SunshineSyncAdapter.class.getSimpleName();
 
+    // 60 seconds (1 minute) * 180 = 3 hours
+    public static final int SYNC_INTERVAL = 60 * 180;
+    public static final int SYNC_FLEXTIME = SYNC_INTERVAL/3;
+
     public SunshineSyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
     }
 
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
-
+        String location = Utils.getPreferenceLocation();
+        String dataJson = Utils.loadDataWether( location );
     }
 
     /**
@@ -76,5 +82,9 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
 
         }
         return newAccount;
+    }
+
+    public static void initializeSyncAdapter(Context context) {
+        getSyncAccount(context);
     }
 }

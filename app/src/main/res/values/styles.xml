@@ -3,12 +3,27 @@
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="android:actionBarStyle">@style/ActionBar.Solid.Sunshine</item>
         <!-- Customize your theme here. -->
+        <!--change color popup-->
+        <!--<item name="android:actionBarWidgetTheme">@style/ActionBar.Solid.Sunshine.widge</item>-->
+
     </style>
 
     <!-- ActionBar style -->
     <style name="ActionBar.Solid.Sunshine"
         parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
         <item name="android:background">@color/sunshine_blue</item>
+
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
+    </style>
+
+    <style name="ActionBar.Solid.Sunshine.widge"
+        parent="@style/Widget.AppCompat.Light.ActionBar">
+        <item name="android:popupMenuStyle">@style/PopupMenu</item>
+    </style>
+
+    <!-- POPUP COLOR-->
+    <style name="PopupMenu" parent="@style/Widget.AppCompat.PopupMenu">
+        <item name="android:popupBackground">@color/grey</item>
     </style>
 
     <!-- Main activity theme -->

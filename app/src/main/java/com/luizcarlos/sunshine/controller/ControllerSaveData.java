@@ -35,13 +35,14 @@ public class ControllerSaveData implements ServiceConnection {
     private static final String JSON_DATE_SAVE = "JSON-DATE-SAVE";
     private static final String LOCATION = "NAME-CITY";
 
-
     private ForecastFragment forecastFragment;
     private String location;
     private SunshineService.Controller controller;
     private String dateSaved;
     private String locationSaved;
     private Boolean isRefresh;
+    private String log;
+    private String lat;
 
     public ControllerSaveData( ForecastFragment fragment, String location, Boolean isRefresh ) {
         this.forecastFragment = fragment;
@@ -116,6 +117,13 @@ public class ControllerSaveData implements ServiceConnection {
         editor.putString( JSON_DATA, stringJson );
         editor.putString( JSON_DATE_SAVE, dateString );
         editor.putString( LOCATION, location );
+
+        if ( lat != null )
+        {
+            editor.putString( "lat", lat );
+            editor.putString( "lon", log );
+        }
+
         editor.commit();
     }
 
@@ -150,6 +158,13 @@ public class ControllerSaveData implements ServiceConnection {
         final String OWN_ID = "id";
 
         JSONObject forecastJson = new JSONObject(forecastJsonStr);
+
+        //get coords
+        JSONObject coords = forecastJson.getJSONObject( "city" ).getJSONObject( "coord" );
+        this.lat = coords.getString( "lat" );
+        this.log = coords.getString( "lon" );
+        LogUtils.info( LOG, String.format( "lat: %s, lon:  %s", lat, log ) );
+
         JSONArray weatherArray = forecastJson.getJSONArray(OWM_LIST);
 
         ArrayList<WeatherDay> resultData = new ArrayList<WeatherDay>();

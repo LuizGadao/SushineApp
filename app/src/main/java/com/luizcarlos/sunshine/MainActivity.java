@@ -74,9 +74,18 @@ public class MainActivity extends ActionBarActivity implements Callback {
                 getString(R.string.pref_location_key),
                 getString(R.string.pref_location_default) );
 
-        Uri geo = Uri.parse("geo:0,0?").buildUpon()
+        String lat = sharedPreferences.getString( "lat", "0" );
+        String lon = sharedPreferences.getString( "lon", "0" );
+        LogUtils.info( TAG, String.format( "location: %s, lat: %s, lon: %s", location, lat, lon ) );
+
+        Uri geo = Uri.parse("geo:" + lat +","+ lon + "?");
+
+        if ( lat.equals("0") )
+        {
+            geo.buildUpon()
                 .appendQueryParameter("q", location)
                 .build();
+        }
 
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(geo);
